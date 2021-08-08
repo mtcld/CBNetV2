@@ -21,5 +21,5 @@
 ```
 
 # Download pretrain [model](https://github.com/CBNetwork/storage/releases/download/v1.0.0/mask_rcnn_cbv2_swin_tiny_patch4_window7_mstrain_480-800_adamw_3x_coco.pth.zip)
-# Sample of [config file](configs/cbnet/loose.py) 
+# Sample of [config file](../configs/cbnet/loose.py) 
 
