@@ -38,7 +38,7 @@ async def async_main(args):
     tasks = asyncio.create_task(async_inference_detector(model, args.img))
     result = await asyncio.gather(tasks)
     # show the results
-    show_result_pyplot(model, args.img, result[0], score_thr=args.score_thr)
+    img_,pred_boxes,pred_segms,pred_labels,scores = show_result_pyplot(model, args.img, result[0], score_thr=args.score_thr)
 
 
 if __name__ == '__main__':

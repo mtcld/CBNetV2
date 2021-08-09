@@ -229,7 +229,7 @@ def show_result_pyplot(model,
     """
     if hasattr(model, 'module'):
         model = model.module
-    model.show_result(
+    return model.show_result(
         img,
         result,
         score_thr=score_thr,
