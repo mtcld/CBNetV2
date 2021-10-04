@@ -240,7 +240,7 @@ data = dict(
     train=dict(
         type='CocoDataset',
         classes=classes,
-        ann_file=data_root+'annotations/train_3k5_mosaic.json',
+        ann_file=data_root+'annotations/train.json',
         img_prefix=data_root+'images/',
         pipeline=train_pipeline),
     val=dict(
@@ -285,9 +285,9 @@ log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook'),dict(type='Ten
 custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-load_from = '/mmdetection/pretrain/mask_rcnn_cbv2_swin_tiny_patch4_window7_mstrain_480-800_adamw_3x_coco.pth'
+load_from = 'pretrain/mask_rcnn_cbv2_swin_tiny_patch4_window7_mstrain_480-800_adamw_3x_coco.pth'
 resume_from = None
 workflow = [('train', 1)]
 fp16 = None
-work_dir = './work_dirs/loose_mosaic_3k5_albu_rotate'
+work_dir = './work_dirs/loose'
 gpu_ids = range(0, 2)

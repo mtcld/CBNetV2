@@ -122,3 +122,7 @@ work_dirs/
 apex/
 augment_data.py
 demo/*.json
+checkpoints/
+demo/*.npy
+demo/*png 
+mmcv
