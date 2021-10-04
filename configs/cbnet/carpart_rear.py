@@ -287,7 +287,7 @@ albu_rear_carpart_transforms = [
                 tile_grid_size=(32,32),
                 p=0.5),
         ],
-        p=0.8),
+        p=0.6),
 ]
 rear_carpart_pipeline = [
     dict(type='LoadImageFromFile'),
@@ -359,7 +359,7 @@ rear_carpart_pipeline = [
 
 wrapper_rear_carpart = dict(
     type= 'RepeatDataset',
-    times=3,
+    times=2,
     dataset=dict(
         type='CocoDataset',
         classes=classes,
