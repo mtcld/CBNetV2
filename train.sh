@@ -1,1 +1,1 @@
-./tools/dist_train.sh configs/cbnet/swa_carpart_rear.py 3
+./tools/dist_train.sh configs/cbnet/swa_dent_pseudo.py 3
