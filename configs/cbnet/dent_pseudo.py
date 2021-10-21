@@ -131,6 +131,11 @@ img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 albu_train_transforms = [
     dict(
+        type='RandomBrightnessContrast',
+        brightness_limit=[0.1, 0.3],
+        contrast_limit=[0.1, 0.3],
+        p=0.12),
+    dict(
         type='OneOf',
         transforms=[
             dict(
@@ -144,110 +149,21 @@ albu_train_transforms = [
                 hue_shift_limit=20,
                 sat_shift_limit=30,
                 val_shift_limit=20,
+                p=1.0),
+            dict(type='CLAHE',
+                tile_grid_size=(32,32),
                 p=1.0)
         ],
-        p=0.1),
+        p=0.12),
 ]
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
     dict(type='RandomFlip', flip_ratio=0.5),
-    dict(type='Rotate',level=3,prob=0.1,max_rotate_angle=20),
+    dict(type='Rotate',level=3,prob=0.12,max_rotate_angle=20),
     dict(
         type='Albu',
         transforms=albu_train_transforms,
-        bbox_params=dict(
-            type='BboxParams',
-            format='pascal_voc',
-            label_fields=['gt_labels'],
-            min_visibility=0.0,
-            filter_lost_elements=True),
-        keymap={
-            'img': 'image',
-            'gt_masks': 'masks',
-            'gt_bboxes': 'bboxes'
-        },
-        update_pad_shape=False,
-        skip_img_without_anno=True),
-    dict(
-        type='AutoAugment',
-        policies=[[{
-            'type':
-            'Resize',
-            'img_scale': [(480, 1024), (512, 1024), (544, 1024), (576, 1024),
-                          (608, 1024), (640, 1024), (672, 1024), (704, 1024),
-                          (736, 1024), (768, 1024), (800, 1024)],
-            'multiscale_mode':
-            'value',
-            'keep_ratio':
-            True
-        }],
-                  [{
-                      'type': 'Resize',
-                      'img_scale': [(400, 1024), (500, 1024), (600, 1024)],
-                      'multiscale_mode': 'value',
-                      'keep_ratio': True
-                  }, {
-                      'type': 'RandomCrop',
-                      'crop_type': 'absolute_range',
-                      'crop_size': (384, 600),
-                      'allow_negative_crop': True
-                  }, {
-                      'type':
-                      'Resize',
-                      'img_scale': [(480, 1024), (512, 1024), (544, 1024),
-                                    (576, 1024), (608, 1024), (640, 1024),
-                                    (672, 1024), (704, 1024), (736, 1024),
-                                    (768, 1024), (800, 1024)],
-                      'multiscale_mode':
-                      'value',
-                      'override':
-                      True,
-                      'keep_ratio':
-                      True
-                  }]]),
-    dict(
-        type='Normalize',
-        mean=[123.675, 116.28, 103.53],
-        std=[58.395, 57.12, 57.375],
-        to_rgb=True),
-    dict(type='Pad', size_divisor=32),
-    dict(type='DefaultFormatBundle'),
-    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'])
-]
-
-pseudo_albu_train_transforms = [
-    dict(
-        type='OneOf',
-        transforms=[
-            dict(
-                type='RGBShift',
-                r_shift_limit=20,
-                g_shift_limit=20,
-                b_shift_limit=10,
-                p=1.0),
-            dict(
-                type='HueSaturationValue',
-                hue_shift_limit=30,
-                sat_shift_limit=30,
-                val_shift_limit=30,
-                p=1.0),
-            dict(
-                type='RandomBrightnessContrast',
-                brightness_limit=[0.1, 0.2],
-                contrast_limit=[0.1, 0.2],
-                p=0.8)
-        ],
-        p=0.2),
-]
-pseudo_train_pipeline = [
-    dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
-    dict(type='RandomFlip', flip_ratio=0.5),
-    dict(type='Rotate',level=3,prob=0.2,max_rotate_angle=30),
-    dict(
-        type='Albu',
-        transforms=pseudo_albu_train_transforms,
         bbox_params=dict(
             type='BboxParams',
             format='pascal_voc',
@@ -327,18 +243,212 @@ test_pipeline = [
         ])
 ]
 
-dataset_merimen_train = dict(
+##########dataset_merimen_mask_train#######################
+
+albu_train_merimen_mask_transforms = [
+    dict(
+        type='RandomBrightnessContrast',
+        brightness_limit=[0.1, 0.3],
+        contrast_limit=[0.1, 0.3],
+        p=0.2),
+    dict(
+        type='OneOf',
+        transforms=[
+            dict(
+                type='RGBShift',
+                r_shift_limit=10,
+                g_shift_limit=10,
+                b_shift_limit=10,
+                p=1.0),
+            dict(
+                type='HueSaturationValue',
+                hue_shift_limit=20,
+                sat_shift_limit=30,
+                val_shift_limit=20,
+                p=1.0),
+            dict(type='CLAHE',
+                tile_grid_size=(32,32),
+                p=1.0)
+        ],
+        p=0.2),
+]
+train_merimen_mask_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(type='Rotate',level=3,prob=0.2,max_rotate_angle=20),
+    dict(
+        type='Albu',
+        transforms=albu_train_merimen_mask_transforms,
+        bbox_params=dict(
+            type='BboxParams',
+            format='pascal_voc',
+            label_fields=['gt_labels'],
+            min_visibility=0.0,
+            filter_lost_elements=True),
+        keymap={
+            'img': 'image',
+            'gt_masks': 'masks',
+            'gt_bboxes': 'bboxes'
+        },
+        update_pad_shape=False,
+        skip_img_without_anno=True),
+    dict(
+        type='AutoAugment',
+        policies=[[{
+            'type':
+            'Resize',
+            'img_scale': [(480, 1024), (512, 1024), (544, 1024), (576, 1024),
+                          (608, 1024), (640, 1024), (672, 1024), (704, 1024),
+                          (736, 1024), (768, 1024), (800, 1024)],
+            'multiscale_mode':
+            'value',
+            'keep_ratio':
+            True
+        }],
+                  [{
+                      'type': 'Resize',
+                      'img_scale': [(400, 1024), (500, 1024), (600, 1024)],
+                      'multiscale_mode': 'value',
+                      'keep_ratio': True
+                  }, {
+                      'type': 'RandomCrop',
+                      'crop_type': 'absolute_range',
+                      'crop_size': (384, 600),
+                      'allow_negative_crop': True
+                  }, {
+                      'type':
+                      'Resize',
+                      'img_scale': [(480, 1024), (512, 1024), (544, 1024),
+                                    (576, 1024), (608, 1024), (640, 1024),
+                                    (672, 1024), (704, 1024), (736, 1024),
+                                    (768, 1024), (800, 1024)],
+                      'multiscale_mode':
+                      'value',
+                      'override':
+                      True,
+                      'keep_ratio':
+                      True
+                  }]]),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='Pad', size_divisor=32),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'])
+]
+
+dataset_merimen_mask_train = dict(
     type='RepeatDataset',
     times=1,
     dataset=dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root+'../merimen_coco_5_8_mask/dent/annotations/clean_total.json',
-        img_prefix=data_root+'../merimen_coco_5_8_mask/dent/images/',
-        pipeline=train_pipeline
+        ann_file=data_root+'../merimen_coco/26_8_mask/dent/annotations/clean_total.json',
+        img_prefix=data_root+'../merimen_coco/26_8_mask/dent/images/',
+        pipeline=train_merimen_mask_pipeline
     )
 )
+
+###########dataset_merimen_pseudo_train###########################
+
+albu_train_merimen_pseudo_transforms = [
+    dict(
+        type='RandomBrightnessContrast',
+        brightness_limit=[0.1, 0.3],
+        contrast_limit=[0.1, 0.3],
+        p=0.2),
+    dict(
+        type='OneOf',
+        transforms=[
+            dict(
+                type='RGBShift',
+                r_shift_limit=10,
+                g_shift_limit=10,
+                b_shift_limit=10,
+                p=1.0),
+            dict(
+                type='HueSaturationValue',
+                hue_shift_limit=20,
+                sat_shift_limit=30,
+                val_shift_limit=20,
+                p=1.0),
+            dict(type='CLAHE',
+                tile_grid_size=(32,32),
+                p=1.0)
+        ],
+        p=0.3),
+]
+train_merimen_pseudo_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(type='Rotate',level=3,prob=0.3,max_rotate_angle=20),
+    dict(
+        type='Albu',
+        transforms=albu_train_merimen_pseudo_transforms,
+        bbox_params=dict(
+            type='BboxParams',
+            format='pascal_voc',
+            label_fields=['gt_labels'],
+            min_visibility=0.0,
+            filter_lost_elements=True),
+        keymap={
+            'img': 'image',
+            'gt_masks': 'masks',
+            'gt_bboxes': 'bboxes'
+        },
+        update_pad_shape=False,
+        skip_img_without_anno=True),
+    dict(
+        type='AutoAugment',
+        policies=[[{
+            'type':
+            'Resize',
+            'img_scale': [(480, 1024), (512, 1024), (544, 1024), (576, 1024),
+                          (608, 1024), (640, 1024), (672, 1024), (704, 1024),
+                          (736, 1024), (768, 1024), (800, 1024)],
+            'multiscale_mode':
+            'value',
+            'keep_ratio':
+            True
+        }],
+                  [{
+                      'type': 'Resize',
+                      'img_scale': [(400, 1024), (500, 1024), (600, 1024)],
+                      'multiscale_mode': 'value',
+                      'keep_ratio': True
+                  }, {
+                      'type': 'RandomCrop',
+                      'crop_type': 'absolute_range',
+                      'crop_size': (384, 600),
+                      'allow_negative_crop': True
+                  }, {
+                      'type':
+                      'Resize',
+                      'img_scale': [(480, 1024), (512, 1024), (544, 1024),
+                                    (576, 1024), (608, 1024), (640, 1024),
+                                    (672, 1024), (704, 1024), (736, 1024),
+                                    (768, 1024), (800, 1024)],
+                      'multiscale_mode':
+                      'value',
+                      'override':
+                      True,
+                      'keep_ratio':
+                      True
+                  }]]),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='Pad', size_divisor=32),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'])
+]
 
 dataset_merimen_pseudo_train = dict(
     type='RepeatDataset',
@@ -347,13 +457,16 @@ dataset_merimen_pseudo_train = dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root+'../merimen_coco_16_8/dent/annotations/post_pseudo.json',
-        img_prefix=data_root+'../merimen_coco_16_8/dent/images/',
-        pipeline=pseudo_train_pipeline
+        ann_file=data_root+'../merimen_coco/12_10/dent/annotations/post_pseudo.json',
+        img_prefix=data_root+'../merimen_coco/12_10/dent/images/',
+        pipeline=train_merimen_pseudo_pipeline
     )
 )
+
+###############################################################
+
 data = dict(
-    samples_per_gpu=3,
+    samples_per_gpu=4,
     workers_per_gpu=2,
     train=[dict(
         type='CocoDataset',
@@ -361,7 +474,8 @@ data = dict(
         ann_file=data_root+'annotations/train.json',
         img_prefix=data_root+'images/',
         pipeline=train_pipeline),
-        dataset_merimen_train],
+        dataset_merimen_mask_train,
+        dataset_merimen_pseudo_train],
     val=dict(
         type='CocoDataset',
         classes=classes,
@@ -397,16 +511,19 @@ lr_config = dict(
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=0.001,
-    step=[22, 25])
+    step=[10, 15])
+
+# normal 22 25 
+# resume from previous merimen day 10 15
 runner = dict(type='EpochBasedRunnerAmp', max_epochs=30)
 checkpoint_config = dict(interval=1)
 log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook'),dict(type='TensorboardLoggerHook')])
 custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-load_from = '/mmdetection/pretrain/mask_rcnn_cbv2_swin_tiny_patch4_window7_mstrain_480-800_adamw_3x_coco.pth'
+load_from = 'checkpoints/dent_pseudo/dent_model_cbnet.pth'
 resume_from = None
 workflow = [('train', 1)]
 fp16 = None
-work_dir = './work_dirs/dent_merimen_pseudo'
+work_dir = './work_dirs/dent_pseudo'
 gpu_ids = range(0, 2)

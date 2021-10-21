@@ -1,1 +1,1 @@
-./tools/dist_train.sh configs/cbnet/carpart_rear_pseudo.py 3
+./tools/dist_train.sh configs/cbnet/scratch_pseudo.py 3
