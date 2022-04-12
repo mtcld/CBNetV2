@@ -1,0 +1,27 @@
+,Carpart,Small damage,Medium damage,Large damage
+0,tyre,904,1053,264
+1,fender,761,31,197
+2,fbu_front_bumper,1696,102,482
+3,door,1894,37,206
+4,qpa_quarter_panel,991,486,29
+5,window,204,438,28
+6,grille,269,734,72
+7,fbe_fog_light_bezel,132,65,302
+8,hood,591,17,20
+9,tail_gate,366,234,166
+10,rbu_rear_bumper,1329,188,37
+11,mirror,75,405,8
+12,fwi_windshield,168,504,6
+13,rocker_panel,194,98,16
+14,hli_head_light,319,234,63
+15,rwi_rear_windshield,104,52,121
+16,tli_tail_light,154,138,56
+17,alloy_wheel,321,167,37
+18,flp_front_license_plate,33,87,196
+19,handle,45,18,21
+20,roof,172,25,3
+21,lli_low_bumper_tail_light,29,33,11
+22,fuel_tank_door,64,5,11
+23,sli_side_turn_light,8,17,11
+24,fli_fog_light,30,23,12
+25,blp_back_license_plate,32,20,11
