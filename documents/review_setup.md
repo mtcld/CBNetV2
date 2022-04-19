@@ -14,6 +14,7 @@
 ```
     git clone https://github.com/open-mmlab/mmcv.git
     cd mmcv
+    git checkout db097bd1e97fc446a7551c715970611d2fcc848d
     MMCV_WITH_OPS=1 MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_86' pip install -e .
 ```
 # Install Apex (for mixed precision training only)
