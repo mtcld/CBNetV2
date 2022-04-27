@@ -4,7 +4,6 @@ import pandas as pd
 import copy
 import numpy as np
 import cv2
-from sklearn.cluster import k_means
 
 def compute_area(seg):
     seg = np.array(seg).reshape(-1,2).astype(np.int32)
