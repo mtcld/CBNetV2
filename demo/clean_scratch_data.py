@@ -47,7 +47,7 @@ def clean_data(input_path, output_path):
     
      upper_limit = 0.15
      lower_limit = np.exp(-11)
-     under_lower_outlier = under_lower_ratio_outlier = df[(df.seg_img_ratio<=lower_limit)]
+     under_lower_ratio_outlier = df[(df.seg_img_ratio<=lower_limit)]
      above_upper_ratio_outlier = df[(df.seg_img_ratio>=upper_limit)]
     
      removed_ann_id = list(under_lower_ratio_outlier.anno_id)
