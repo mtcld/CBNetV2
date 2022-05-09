@@ -14,6 +14,7 @@ import pandas as pd
 from tqdm import tqdm
 import random
 from hyperopt import hp, fmin, tpe, Trials
+import pickle
 
 # def objective_func(space, gt_data, imgs_dir, model):
 #     conf_score = space['conf_score']['conf_score']
@@ -130,19 +131,19 @@ def parse_args():
     return args
     
 def main(args):
-    model = init_detector(args.model_config, args.model_checkpoint, device = 'cuda:2')
+    model = init_detector(args.model_config, args.model_checkpoint, device = 'cuda:1')
     imgs_dir = args.images_path
     gt_path = args.json_file
     gt_data = json.load(open(gt_path))
 
     conf_f1_df = pd.DataFrame(columns= ['conf_score', 'f1_score'])
-    conf_f1_df.to_csv('/mmdetection/demo/statistical_charts/conf_f1_searching_pairs.csv', index=False)
+    conf_f1_df.to_csv('/mmdetection/demo/statistical_charts/conf_f1_searching_pair.csv', index=False)
     def objective_func(conf_score):
         #conf_score = conf_score['conf_score']
         precision_mean, recall_mean, f1_mean = compute_mean_metrics(gt_data, conf_score, imgs_dir, model)
         row = [conf_score, f1_mean]
         new_row_df = pd.DataFrame([row])
-        new_row_df.to_csv('/mmdetection/demo/statistical_charts/conf_f1_searching_pairs.csv', mode= 'a', index=False, header=False)
+        new_row_df.to_csv('/mmdetection/demo/statistical_charts/conf_f1_searching_pair.csv', mode= 'a', index=False, header=False)
         # print(len(conf_f1_df))
         return -f1_mean
 
@@ -150,17 +151,25 @@ def main(args):
     #objective = objective_func(conf_score)
 
     trials = Trials()
+    # trials = pickle.load(open("/mmdetection/demo/statistical_charts/conf_score_trials.p", "rb"))
 
     best = fmin(fn = objective_func, space = conf_score_space, algo = tpe.suggest,trials=trials, max_evals = 100)
- 
-    print('final_result: ', best)
-    
-    return best 
+    pickle.dump(trials, open("/mmdetection/demo/statistical_charts/conf_score_trials.p", "wb"))
+#https://github.com/hyperopt/hyperopt/issues/267
+    return best, trials
 
 if __name__ == '__main__':
     args = parse_args()
-    main(args)
-    conf_f1_df = pd.read_csv('/mmdetection/demo/statistical_charts/conf_f1_searching_pairs.csv')
-    # conf_f1_df['f1_score'] = pd.to_numeric(conf_f1_df['f1_score'])
-    max_f1_index = conf_f1_df['f1_score'].idxmax()
-    print(conf_f1_df.loc[max_f1_index])
+    best, trials = main(args)
+    print('final conf result: ', best)
+    print('best f1 score: ', -min(trials.losses()))
+
+    # print('a list of dictionaries representing everything about the search',trials.trials)
+    # print('a list of dictionaries returned by "objective" during the search ',trials.results)
+    # print('a list of losses (float for each "ok" trial) ',trials.losses())
+    # print(' a list of status strings ',trials.statuses())
+    
+    # conf_f1_df = pd.read_csv('/mmdetection/demo/statistical_charts/conf_f1_searching_pair.csv')
+    # # conf_f1_df['f1_score'] = pd.to_numeric(conf_f1_df['f1_score'])
+    # max_f1_index = conf_f1_df['f1_score'].idxmax()
+    # print(conf_f1_df.loc[max_f1_index])
