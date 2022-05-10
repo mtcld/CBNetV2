@@ -156,6 +156,7 @@ def main(args):
     best = fmin(fn = objective_func, space = conf_score_space, algo = tpe.suggest,trials=trials, max_evals = 100)
     pickle.dump(trials, open("/mmdetection/demo/statistical_charts/conf_score_trials.p", "wb"))
 #https://github.com/hyperopt/hyperopt/issues/267
+#http://hyperopt.github.io/hyperopt/getting-started/minimizing_functions/
     return best, trials
 
 if __name__ == '__main__':
@@ -168,7 +169,7 @@ if __name__ == '__main__':
     # print('a list of dictionaries returned by "objective" during the search ',trials.results)
     # print('a list of losses (float for each "ok" trial) ',trials.losses())
     # print(' a list of status strings ',trials.statuses())
-    
+
     # conf_f1_df = pd.read_csv('/mmdetection/demo/statistical_charts/conf_f1_searching_pair.csv')
     # # conf_f1_df['f1_score'] = pd.to_numeric(conf_f1_df['f1_score'])
     # max_f1_index = conf_f1_df['f1_score'].idxmax()
