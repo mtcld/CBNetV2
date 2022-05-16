@@ -1,4 +1,5 @@
 import argparse
+from logging import critical
 from mmdet.apis import init_detector, inference_detector, show_result_pyplot
 import mmcv
 from mmdet.models import build_detector
@@ -22,12 +23,36 @@ import pickle
 #     precision_mean, recall_mean, f1_mean = compute_mean_metrics(gt_data, conf_score, imgs_dir, model)
 #     return -f1_mean
 
-def compute_iou(ground_truth_mask, predict_mask):
+def compute_mask_iou(ground_truth_mask, predict_mask):
     area1 = np.sum(ground_truth_mask)
     area2 = np.sum(predict_mask)
     intersection = np.sum(np.logical_and(ground_truth_mask, predict_mask))
     iou = intersection/(area1+area2-intersection)
     return iou
+def compute_bbox_iou(ground_truth_bbox, predict_bbox):
+    gt_top_left_x = ground_truth_bbox[0]
+    gt_top_left_y = ground_truth_bbox[1]
+    gt_bottom_right_x = gt_top_left_x + ground_truth_bbox[2]
+    gt_bottom_right_y = gt_top_left_y + ground_truth_bbox[3]
+
+    pd_top_left_x = predict_bbox[0]
+    pd_top_left_y = predict_bbox[1]
+    pd_bottom_right_x = pd_top_left_x + predict_bbox[2]
+    pd_bottom_right_y = pd_top_left_y + predict_bbox[3]
+
+    x_left = max(gt_top_left_x, pd_top_left_x)
+    x_right = min(gt_bottom_right_x, pd_bottom_right_x)
+    y_top = max(gt_top_left_y, pd_top_left_y)
+    y_bottom = min(gt_bottom_right_y, pd_bottom_right_y)
+    
+    if x_right < x_left or y_bottom < y_top:
+        return 0.0
+    intersection = (x_right-x_left) * (y_bottom-y_top)
+    gt_area = ground_truth_bbox[2] * ground_truth_bbox[3]
+    pd_area = predict_bbox[2] * predict_bbox[3]
+    iou = intersection/(gt_area+pd_area-intersection)
+    return iou
+
 
 def draw_binary_mask(seg, img_shape):
     seg = seg.reshape(-1,2).astype(np.int32)
@@ -43,8 +68,8 @@ def img_to_ann(gt_data):
 def load_predicted_result(model, img, conf_score=0.001):
     result = inference_detector(model, img.copy())
     out_image,pd_boxes,pd_segs,pd_labels,pd_scores = show_result_pyplot(model,img.copy(),result,score_thr=conf_score)
-    return pd_segs,pd_scores,out_image
-def compute_eval_metrics(img_shape, pred_boxes,gt_boxes):
+    return pd_segs,pd_scores,pd_boxes,out_image
+def compute_eval_metrics(img_shape, pred_boxes,gt_boxes, iou_criteria):
     '''
     return (tp,fp,fn, precision, recall, f1_score)
     '''
@@ -58,8 +83,11 @@ def compute_eval_metrics(img_shape, pred_boxes,gt_boxes):
         #print(gt_labels)
         ious = []
         for gt_box in gt_boxes:
-            gt_box = draw_binary_mask(gt_box, img_shape)
-            ious.append(compute_iou(gt_box, pred_box))
+            if iou_criteria == 'mask_iou':
+                gt_box = draw_binary_mask(gt_box, img_shape)
+                ious.append(compute_mask_iou(gt_box, pred_box))
+            elif iou_criteria == 'bbox_iou':
+                ious.append(compute_bbox_iou(gt_box, pred_box))
       
         if len(ious) == 0:
             return 0,0,0,0,0,0
@@ -86,7 +114,7 @@ def compute_eval_metrics(img_shape, pred_boxes,gt_boxes):
 
     return tp,fp,fn,precision,recall,f1_score
 
-def compute_mean_metrics(gt_data, conf_score,imgs_dir, model):
+def compute_mean_metrics(gt_data, conf_score,imgs_dir, model, iou_criteria):
     precision = 0
     recall = 0
     f1 = 0
@@ -101,16 +129,22 @@ def compute_mean_metrics(gt_data, conf_score,imgs_dir, model):
         img_shape = img.shape[:2]
         gt_anns = imgToAnn[img_id]
         gt_segs = [np.array(ann['segmentation']) for ann in gt_anns]
+        gt_boxes = [ann['bbox'] for ann in gt_anns]
+
   
         #load predicted masks
         predicted_results = load_predicted_result(model, img)
         pred_segs = predicted_results[0]
-        
         pred_scores = predicted_results[1]
+        pred_boxes = predicted_results[2]
         #print('debug 2:',len(pred_scores),len(pred_segs),conf_score)
         
         pd_segs = np.array([pred_seg for pred_seg,pred_score in zip(pred_segs,pred_scores) if pred_score>=conf_score])
-        tp,fp,fn, _precision, _recall, f1_score = compute_eval_metrics(img_shape, pd_segs,gt_segs)
+        if iou_criteria == 'mask_iou':
+            tp,fp,fn, _precision, _recall, f1_score = compute_eval_metrics(img_shape, pd_segs,gt_segs,iou_criteria)
+        elif iou_criteria == 'bbox_iou':
+            tp,fp,fn, _precision, _recall, f1_score = compute_eval_metrics(img_shape,pred_boxes,gt_boxes,iou_criteria)
+
         precision += _precision
         recall += _recall
         f1 += f1_score
@@ -126,6 +160,7 @@ def parse_args():
     parser.add_argument('model_checkpoint', type=str, help='path to model checkpoint file')
     parser.add_argument('images_path', type=str, help='path to images folder')
     parser.add_argument('json_file', type=str, help='path to annotating json file')
+    parser.add_argument('iou_criteria', choices=['mask_iou', 'bbox_iou'])
 
     args = parser.parse_args()
     return args
@@ -140,7 +175,7 @@ def main(args):
     conf_f1_df.to_csv('/mmdetection/demo/statistical_charts/conf_f1_searching_pair.csv', index=False)
     def objective_func(conf_score):
         #conf_score = conf_score['conf_score']
-        precision_mean, recall_mean, f1_mean = compute_mean_metrics(gt_data, conf_score, imgs_dir, model)
+        precision_mean, recall_mean, f1_mean = compute_mean_metrics(gt_data, conf_score, imgs_dir, model, args.iou_criteria)
         row = [conf_score, f1_mean]
         new_row_df = pd.DataFrame([row])
         new_row_df.to_csv('/mmdetection/demo/statistical_charts/conf_f1_searching_pair.csv', mode= 'a', index=False, header=False)
