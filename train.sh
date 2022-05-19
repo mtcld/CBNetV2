@@ -1,1 +1,1 @@
-./tools/dist_train.sh configs/cbnet/scratch_pseudo.py 3
+./tools/dist_train.sh configs/cbnet/origin_crack_merimen.py 3

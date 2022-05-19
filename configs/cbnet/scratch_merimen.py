@@ -335,14 +335,14 @@ dataset_merimen_mask_train = dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root+'../merimen_coco/26_8_mask/scratch/annotations/clean_total.json',
-        img_prefix=data_root+'../merimen_coco/26_8_mask/scratch/images/',
+        ann_file=data_root+'../merimen_coco/19_02_2022/scratch/annotations/post_pseudo_clean_v1.json',
+        img_prefix=data_root+'../merimen_coco/19_02_2022/scratch/images/',
         pipeline=train_merimen_mask_pipeline
     )
 )
 data = dict(
     samples_per_gpu=4,
-    workers_per_gpu=2,
+    workers_per_gpu=4,
     train=[dict(
         type='CocoDataset',
         classes=classes,
@@ -396,5 +396,5 @@ load_from = '/mmdetection/pretrain/mask_rcnn_cbv2_swin_tiny_patch4_window7_mstra
 resume_from = None
 workflow = [('train', 1)]
 fp16 = None
-work_dir = './work_dirs/scratch'
+work_dir = './work_dirs/scratch_06_04'
 gpu_ids = range(0, 2)
