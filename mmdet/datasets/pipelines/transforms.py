@@ -2766,8 +2766,7 @@ class YOLOXHSVRandomAug:
 @PIPELINES.register_module()
 class YOLOScaledHSVRandomAug:
     """Apply HSV augmentation to image sequentially. It is referenced from
-    https://github.com/Megvii-
-    BaseDetection/YOLOX/blob/main/yolox/data/data_augment.py#L21.
+    https://github.com/WongKinYiu/ScaledYOLOv4/blob/yolov4-large/utils/datasets.py#L585.
 
     Args:
         hgain (float): delta of hue. Default: 0.5.
@@ -2775,7 +2774,7 @@ class YOLOScaledHSVRandomAug:
         vgain (float): delat of value. Default: 0.5.
     """
 
-    def __init__(self, hgain=5, sgain=30, vgain=30):
+    def __init__(self, hgain=0.5, sgain=0.5, vgain=0.5):
         self.hgain = hgain
         self.sgain = sgain
         self.vgain = vgain
