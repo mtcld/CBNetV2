@@ -1504,9 +1504,12 @@ class Albu:
                 if 'masks' in results:
                     results['masks'] = np.array(
                         [results['masks'][i] for i in results['idx_mapper']])
+                    #try : 
                     results['masks'] = ori_masks.__class__(
                         results['masks'], results['image'].shape[0],
                         results['image'].shape[1])
+                    #except:
+                    #    print(results)
 
                 if (not len(results['idx_mapper'])
                         and self.skip_img_without_anno):
@@ -2759,6 +2762,49 @@ class YOLOXHSVRandomAug:
         repr_str += f'saturation_delta={self.saturation_delta}, '
         repr_str += f'value_delta={self.value_delta})'
         return repr_str
+
+@PIPELINES.register_module()
+class YOLOScaledHSVRandomAug:
+    """Apply HSV augmentation to image sequentially. It is referenced from
+    https://github.com/Megvii-
+    BaseDetection/YOLOX/blob/main/yolox/data/data_augment.py#L21.
+
+    Args:
+        hgain (float): delta of hue. Default: 0.5.
+        sgain (float): delta of saturation. Default: 0.5.
+        vgain (float): delat of value. Default: 0.5.
+    """
+
+    def __init__(self, hgain=5, sgain=30, vgain=30):
+        self.hgain = hgain
+        self.sgain = sgain
+        self.vgain = vgain
+
+    def __call__(self, results):
+        img = results['img']
+        r = np.random.uniform(-1, 1, 3) * [self.hgain, self.sgain, self.vgain] + 1  # random gains
+        hue, sat, val = cv2.split(cv2.cvtColor(img, cv2.COLOR_BGR2HSV))
+        dtype = img.dtype  # uint8
+
+        x = np.arange(0, 256, dtype=np.int16)
+        lut_hue = ((x * r[0]) % 180).astype(dtype)
+        lut_sat = np.clip(x * r[1], 0, 255).astype(dtype)
+        lut_val = np.clip(x * r[2], 0, 255).astype(dtype)
+
+        img_hsv = cv2.merge((cv2.LUT(hue, lut_hue), cv2.LUT(sat, lut_sat), cv2.LUT(val, lut_val))).astype(dtype)
+        cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR, dst=img)
+        #cv2.cvtColor(img_hsv.astype(img.dtype), cv2.COLOR_HSV2BGR, dst=img)
+
+        results['img'] = img
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += f'(hgain={self.hgain}, '
+        repr_str += f'sgain={self.sgain}, '
+        repr_str += f'vgain={self.vgain})'
+        return repr_str
+
 
 
 @PIPELINES.register_module()
