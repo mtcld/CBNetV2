@@ -1,5 +1,5 @@
 from .collect_env import collect_env
-from .logger import get_root_logger
+from .logger import get_root_logger,log_img_scale
 from .optimizer import DistOptimizerHook
 
-__all__ = ['get_root_logger', 'collect_env', 'DistOptimizerHook']
+__all__ = ['get_root_logger', 'collect_env', 'DistOptimizerHook','log_img_scale']

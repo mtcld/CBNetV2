@@ -1,0 +1,1 @@
+./tools/dist_train.sh configs/cbnet/loose.py 2

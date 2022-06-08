@@ -4,7 +4,7 @@ import numpy as np
 import pycocotools.mask as mask_util
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Polygon
-
+import cv2
 from ..utils import mask2ndarray
 
 EPS = 1e-2
@@ -35,7 +35,7 @@ def imshow_det_bboxes(img,
                       text_color='green',
                       mask_color=None,
                       thickness=2,
-                      font_size=13,
+                      font_size=0.5,
                       win_name='',
                       show=True,
                       wait_time=0,
@@ -110,80 +110,27 @@ def imshow_det_bboxes(img,
     width, height = img.shape[1], img.shape[0]
     img = np.ascontiguousarray(img)
 
-    fig = plt.figure(win_name, frameon=False)
-    plt.title(win_name)
-    canvas = fig.canvas
-    dpi = fig.get_dpi()
-    # add a small EPS to avoid precision lost due to matplotlib's truncation
-    # (https://github.com/matplotlib/matplotlib/issues/15363)
-    fig.set_size_inches((width + EPS) / dpi, (height + EPS) / dpi)
-
-    # remove white edges by set subplot margin
-    plt.subplots_adjust(left=0, right=1, bottom=0, top=1)
-    ax = plt.gca()
-    ax.axis('off')
-
-    polygons = []
-    color = []
+    bbox_res=[]
     for i, (bbox, label) in enumerate(zip(bboxes, labels)):
         bbox_int = bbox.astype(np.int32)
-        poly = [[bbox_int[0], bbox_int[1]], [bbox_int[0], bbox_int[3]],
-                [bbox_int[2], bbox_int[3]], [bbox_int[2], bbox_int[1]]]
-        np_poly = np.array(poly).reshape((4, 2))
-        polygons.append(Polygon(np_poly))
-        color.append(bbox_color)
+        left_top = (bbox_int[0], bbox_int[1])
+        right_bottom = (bbox_int[2], bbox_int[3])
+        bbox_res.append([left_top,right_bottom])
+        cv2.rectangle(
+            img, left_top, right_bottom, bbox_color, thickness=thickness)
         label_text = class_names[
-            label] if class_names is not None else f'class {label}'
+            label] if class_names is not None else f'cls {label}'
         if len(bbox) > 4:
             label_text += f'|{bbox[-1]:.02f}'
-        ax.text(
-            bbox_int[0],
-            bbox_int[1],
-            f'{label_text}',
-            bbox={
-                'facecolor': 'black',
-                'alpha': 0.8,
-                'pad': 0.7,
-                'edgecolor': 'none'
-            },
-            color=text_color,
-            fontsize=font_size,
-            verticalalignment='top',
-            horizontalalignment='left')
+        cv2.putText(img, label_text, (bbox_int[0], bbox_int[1] - 2),
+                    cv2.FONT_HERSHEY_COMPLEX, font_size, text_color)
+
         if segms is not None:
             color_mask = mask_colors[labels[i]]
             mask = segms[i].astype(bool)
             img[mask] = img[mask] * 0.5 + color_mask * 0.5
 
-    plt.imshow(img)
-
-    p = PatchCollection(
-        polygons, facecolor='none', edgecolors=color, linewidths=thickness)
-    ax.add_collection(p)
-
-    stream, _ = canvas.print_to_buffer()
-    buffer = np.frombuffer(stream, dtype='uint8')
-    img_rgba = buffer.reshape(height, width, 4)
-    rgb, alpha = np.split(img_rgba, [3], axis=2)
-    img = rgb.astype('uint8')
-    img = mmcv.rgb2bgr(img)
-
-    if show:
-        # We do not use cv2 for display because in some cases, opencv will
-        # conflict with Qt, it will output a warning: Current thread
-        # is not the object's thread. You can refer to
-        # https://github.com/opencv/opencv-python/issues/46 for details
-        if wait_time == 0:
-            plt.show()
-        else:
-            plt.show(block=False)
-            plt.pause(wait_time)
-    if out_file is not None:
-        mmcv.imwrite(img, out_file)
-
-    plt.close()
-
-    return img
+    return img,bbox_res,segms,labels, scores[inds]
 
 
 def imshow_gt_det_bboxes(img,

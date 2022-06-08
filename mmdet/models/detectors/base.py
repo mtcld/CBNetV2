@@ -265,7 +265,7 @@ class BaseDetector(BaseModule, metaclass=ABCMeta):
                     text_color=(72, 101, 241),
                     mask_color=None,
                     thickness=2,
-                    font_size=13,
+                    font_size=0.5,
                     win_name='',
                     show=False,
                     wait_time=0,
@@ -324,7 +324,7 @@ class BaseDetector(BaseModule, metaclass=ABCMeta):
         if out_file is not None:
             show = False
         # draw bounding boxes
-        img = imshow_det_bboxes(
+        img,bboxes,segms,labels,scores = imshow_det_bboxes(
             img,
             bboxes,
             labels,
@@ -340,9 +340,8 @@ class BaseDetector(BaseModule, metaclass=ABCMeta):
             show=show,
             wait_time=wait_time,
             out_file=out_file)
-
-        if not (show or out_file):
-            return img
+        
+        return img,bboxes,segms,labels,scores
 
     def onnx_export(self, img, img_metas):
         raise NotImplementedError(f'{self.__class__.__name__} does '
