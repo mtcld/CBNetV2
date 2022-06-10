@@ -2791,8 +2791,7 @@ class YOLOScaledHSVRandomAug:
         lut_val = np.clip(x * r[2], 0, 255).astype(dtype)
 
         img_hsv = cv2.merge((cv2.LUT(hue, lut_hue), cv2.LUT(sat, lut_sat), cv2.LUT(val, lut_val))).astype(dtype)
-        cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR, dst=img)
-        #cv2.cvtColor(img_hsv.astype(img.dtype), cv2.COLOR_HSV2BGR, dst=img)
+        img = cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR)
 
         results['img'] = img
         return results
