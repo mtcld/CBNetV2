@@ -1,0 +1,29 @@
+{
+    "os": "Linux-5.4.0-1073-oracle-x86_64-with-debian-buster-sid",
+    "python": "3.7.7",
+    "heartbeatAt": "2022-06-09T10:45:14.929381",
+    "startedAt": "2022-06-09T10:45:13.417638",
+    "docker": null,
+    "gpu": "Tesla V100-SXM2-16GB",
+    "gpu_count": 2,
+    "cpu_count": 24,
+    "cuda": "10.1.243",
+    "args": [
+        "--local_rank=0",
+        "configs/damage_models/scratch_v1/scratch.py",
+        "--launcher",
+        "pytorch"
+    ],
+    "state": "running",
+    "program": "./tools/train.py",
+    "codePath": "tools/train.py",
+    "git": {
+        "remote": "https://github.com/thangnx183/CBNetV2",
+        "commit": "4d6b2d169124ee5ad0e18f53a9cd4eb41f457d90"
+    },
+    "email": null,
+    "root": "/mmdetection",
+    "host": "d75df9e9555e",
+    "username": "root",
+    "executable": "/opt/conda/bin/python"
+}

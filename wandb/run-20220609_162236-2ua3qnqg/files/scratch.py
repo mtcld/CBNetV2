@@ -1,0 +1,1 @@
+/mmdetection/checkpoints/scratch/draft_scratch/scratch.py
