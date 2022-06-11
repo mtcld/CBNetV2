@@ -249,12 +249,12 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=3,
+    samples_per_gpu=2,
     workers_per_gpu=2,
     train=dict(
         type='CocoDataset',
         classes=['scratch'],
-        ann_file='data/scratch/annotations/clean_train.json',
+        ann_file='data/scratch/annotations/clean_train_5k.json',
         img_prefix='data/scratch/images/',
         pipeline=[
             dict(type='LoadImageFromFile'),
@@ -429,4 +429,4 @@ resume_from = None
 workflow = [('train', 1)]
 fp16 = None
 work_dir = '/mmdetection/checkpoints/scratch/demo_scratch'
-gpu_ids = range(0, 1)
+gpu_ids = range(0, 2)
