@@ -1,1 +1,1 @@
-./tools/dist_train.sh configs/cbnet/loose.py 2
+./tools/dist_train.sh configs/cbnet/scratch-copy-paste.py 3
