@@ -527,6 +527,21 @@ class BitmapMasks(BaseInstanceMasks):
         masks = (rng.rand(num_masks, height, width) > 0.1).astype(dtype)
         self = cls(masks, height=height, width=width)
         return self
+    
+    def get_bboxes(self):
+        num_masks = len(self)
+        boxes = np.zeros((num_masks, 4), dtype=np.float32)
+        x_any = self.masks.any(axis=1)
+        y_any = self.masks.any(axis=2)
+        for idx in range(num_masks):
+            x = np.where(x_any[idx, :])[0]
+            y = np.where(y_any[idx, :])[0]
+            if len(x) > 0 and len(y) > 0:
+                # use +1 for x_max and y_max so that the right and bottom
+                # boundary of instance masks are fully included by the box
+                boxes[idx, :] = np.array([x[0], y[0], x[-1] + 1, y[-1] + 1],
+                                         dtype=np.float32)
+        return boxes
 
 
 class PolygonMasks(BaseInstanceMasks):

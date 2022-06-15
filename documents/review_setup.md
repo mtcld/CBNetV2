@@ -8,8 +8,14 @@
 - docker setup image  
 `docker build -t cbnet_image docker/`
 - setup container  
-`nvidia-docker run --name cbn --gpus all --shm-size=32g -p 7000:7000 -p 7001:7001 -it -v /data/thang/CBNetV2/:/mmdetection -v /data/thang/mmdetection/data/:/mmdetection/data  cbnet_image`
+`nvidia-docker run --name cbn --gpus all --shm-size=64g -p 7000:7000 -p 7001:7001 -it -v /data1/thang/CBNetV2/:/mmdetection -v /data1/thang/datasets/:/mmdetection/data  cbnet_image`
 
+# Intall mmcv 
+```
+    git clone https://github.com/open-mmlab/mmcv.git
+    cd mmcv
+    MMCV_WITH_OPS=1 MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_86' pip install -e .
+```
 # Install Apex (for mixed precision training only)
 - download repo  
 `git clone https://github.com/NVIDIA/apex`
