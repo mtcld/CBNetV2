@@ -1,6 +1,14 @@
 # dataset settings
 dataset_type = 'CocoDataset'
-data_root = 'data/coco/'
+data_root = '/data/motionscloud/training/carpart/data/'
+
+classes = ['sli_side_turn_light', 'tyre', 'alloy_wheel', 'hli_head_light', 'hood',
+    'fwi_windshield', 'flp_front_license_plate', 'door', 'mirror', 'handle',
+    'qpa_quarter_panel', 'fender', 'grille', 'fbu_front_bumper', 'rocker_panel', 'rbu_rear_bumper',
+    'pillar', 'roof', 'blp_back_license_plate', 'window', 'rwi_rear_windshield',
+    'tail_gate', 'tli_tail_light', 'fbe_fog_light_bezel', 'fli_fog_light', 'fuel_tank_door',
+    'lli_low_bumper_tail_light','exhaust']
+
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -29,21 +37,24 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=2,
-    workers_per_gpu=2,
+    samples_per_gpu=1,
+    workers_per_gpu=1,
     train=dict(
+        classes=classes,
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_train2017.json',
-        img_prefix=data_root + 'train2017/',
+        ann_file=data_root + 'annotations/train_2-3-cleanfender_quater.json',
+        img_prefix=data_root + 'images/',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_val2017.json',
-        img_prefix=data_root + 'val2017/',
+        classes=classes,
+        ann_file=data_root + 'annotations/valid.json',
+        img_prefix=data_root + 'images/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_val2017.json',
-        img_prefix=data_root + 'val2017/',
+        classes=classes,
+        ann_file=data_root + 'annotations/valid.json',
+        img_prefix=data_root + 'images/',
         pipeline=test_pipeline))
 evaluation = dict(metric=['bbox', 'segm'])
