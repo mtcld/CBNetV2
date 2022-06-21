@@ -145,7 +145,7 @@ def train_detector(model,
             runner.register_hook(DistSamplerSeedHook())
 
     # register eval hooks
-    if validate:
+    if False:
         # Support batch_size > 1 in validation
         val_samples_per_gpu = cfg.data.val.pop('samples_per_gpu', 1)
         if val_samples_per_gpu > 1:
