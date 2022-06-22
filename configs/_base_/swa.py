@@ -10,7 +10,7 @@ swa_load_from = 'best_bbox_mAP.pth'
 swa_resume_from = None
 
 # swa optimizer
-swa_optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
+#swa_optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
 swa_optimizer_config = dict(grad_clip=None)
 
 # swa learning policy
