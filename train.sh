@@ -1,1 +1,1 @@
-./tools/dist_train.sh configs/cbnet/scratch-copy-paste.py 3
+./tools/dist_train.sh configs/cbnet/scratch-copy-paste-HSV-LSJ-merimen-fully-match.py 3
