@@ -30,40 +30,9 @@ model = dict(
         feat_channels=256,
         anchor_generator=dict(
             type='AnchorGenerator',
-            # scales=[8],
-
-            scales = [1,1.15,1.3], #v13, v17
-            base_sizes = [30,99,177,262,368],#v13, v17
-
-            # scales = [1],#v14
-            # base_sizes = [ 6.13915378, 15.30817663, 15.81447526, 38.35236013, 110.88941897],#v14
-
-            # scales = [1, 1.1, 1.25], #v15
-            # base_sizes = [99, 174, 240, 282, 339], #v15
-
-            # scales = [224],#v11
-            # ratios=[0.5, 1.0, 2.0],
-            # ratios = [2.76267655, 2.61600145,  1.8355167, 3.04136575, 2.25080659], #v6
-            # ratios = [0.88189713,1.88796302, 1.46820024, 3.46467267, 3.47708992], #v7 deleted
-            # ratios = [1.57004273, 2.03738318, 1.87690971], #v7
-            # ratios = [0.63692534, 0.49082569, 0.53279068], #v8
-            # ratios = [2.45544554, 0.32258065, 1.28806584, 0.53349282, 0.84834123], #v10 - yolo anchor generator
-            # ratios = [0.40740022,1.23485843,2.85315915,6.56536858,16.44087155], #v11
-            # ratios = [0.3434203,0.94352366,1.92110634,3.7757587,7.58430032], #v12, v13 (clean data vs v11)
-            # ratios = [0.26666587, 1.13321785, 0.4838764 , 0.65653432, 0.51883537], #v14 need to continue training if having time
-            # ratios = [0.121, 0.232, 0.326, 0.51,  0.572, 0.654, 0.805, 0.843, 0.89,  1.108, 1.269, 1.403,2.276, 2.912, 5.667], #v15
-            # ratios = [0.121, 0.326,  0.572, 0.805,  1.108, 1.403, 2.912, 5.667], #v15' eliminate some seemly redundant ratios
-            ratios = [0.78317611,3.33879393,0.20926115,1.6726223,6.61393795,9.44650379,0.47774664,2.36350967,1.16334484,4.67465383], #v17
-            
-            strides=[4, 8, 16, 32, 64]), # keep intact because it totally depends on output of the backbone
-            
-            # strides = [3131.,4688.75,9507.375,11651.75,18884.5]),#v10
-            # strides = [4.00446634,56.3339028,162.26243988,335.98506399,667.53152617]), #v11
-            # strides = [3.9769167,55.70587774,159.89952107,327.70855591,628.87477123]),#v12
-        # strides = [3.75250992, 23.87628289, 48.33591151, 14.08338183, 34.31873246]),
-        # strides = [4, 24, 48, 14, 34]) #v6,
-        # strides = [ 2, 8, 14, 24, 30]), #v7 deleted
-        # strides = [1,3,10]), #v7
+            scales=[8],
+            ratios=[0.5, 1.0, 2.0],
+            strides=[4, 8, 16, 32, 64]),
         bbox_coder=dict(
             type='DeltaXYWHBBoxCoder',
             target_means=[0.0, 0.0, 0.0, 0.0],
@@ -137,7 +106,7 @@ model = dict(
                 match_low_quality=True,
                 ignore_iof_thr=-1),
             sampler=dict(
-                type='RandomSampler',
+                type='OHEMSampler',
                 num=512,
                 pos_fraction=0.25,
                 neg_pos_ub=-1,
@@ -456,8 +425,8 @@ custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 load_from = '/mmdetection/checkpoints/scratch/pretrained_models/mask_rcnn_cbv2_swin_tiny_patch4_window7_mstrain_480-800_adamw_3x_coco.pth'
-resume_from = '/mmdetection/checkpoints/scratch/demo_scratch_v17/latest.pth'
+resume_from = None
 workflow = [('train', 1)]
 fp16 = None
-work_dir = '/mmdetection/checkpoints/scratch/demo_scratch_v17'
+work_dir = '/mmdetection/checkpoints/scratch/demo_scratch_v9'
 gpu_ids = range(0, 2)
