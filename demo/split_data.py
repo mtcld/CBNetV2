@@ -36,3 +36,5 @@ def main():
     
 if __name__ == '__main__':
     main()
+
+#python ./demo/split_data.py /mmdetection/data/scratch/annotations/clean_train.json /mmdetection/data/scratch/annotations/ 'clean_train_8k' 8000
