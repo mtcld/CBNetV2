@@ -20,7 +20,7 @@ def create_box_df(damage_data):
         
     column_names = ['ann_id', 'img_id', 'img_width', 'img_height', 'box_width', 'box_height', 'xmin', 'ymin']
     box_df = pd.DataFrame(value_list, columns = column_names)
-    box_df['new_img_w'], box_df['new_img_h'] = np.vectorize(_compute_new_static_size)(box_df['img_width'], box_df['img_height'], min_dimension, max_dimension)
+    box_df['new_img_w'], box_df['new_img_h'] = np.vectorize(_compute_new_static_size)(box_df['img_width'], box_df['img_height'])
     box_df['new_b_w'] = box_df['new_img_w']*box_df['box_width']/box_df['img_width']
     box_df['new_b_h'] = box_df['new_img_h']*box_df['box_height']/box_df['img_height']
     box_df['new_box_ar'] = box_df['new_b_h']/box_df['new_b_w']
@@ -42,16 +42,16 @@ def cluster_ratio_area(box_df, output_dir):
     ar_centers = list(np.array(ar_labels.cluster_centers_).reshape(1,-1)[0])
 
     # cluster 15 areas
-    S = (box_ar_scale_filtered['new_box_area'].values).reshape(-1,1)
+    S = (box_df['new_box_area'].values).reshape(-1,1)
     area_K = KMeans(15, random_state = 1)
     area_labels = area_K.fit(S)
-    area_centers = np.array(larea_abels.cluster_centers_)
+    area_centers = np.array(area_labels.cluster_centers_)
     area_centers = np.array([i for i in area_centers])
     area_centers = np.sort(np.sqrt(area_centers), axis = None).reshape(5,-1)
     base_sizes = [round(c[0]) for c in area_centers]
 
-    ele2 = [row[1] for row in area_15_ratio]
-    ele3 = [row[2] for row in area_15_ratio]
+    ele2 = [row[1] for row in area_centers]
+    ele3 = [row[2] for row in area_centers]
     avg2=sum(ele2)/len(ele2)
     special_ele2 = [ele for ele in ele2 if ele>avg2]
 
