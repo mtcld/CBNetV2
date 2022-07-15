@@ -39,7 +39,9 @@ def cluster_ratio_area(box_df, output_dir):
 
     ar_K = KMeans(5, random_state = 1)
     ar_labels = ar_K.fit(AR)
-    ar_centers = list(np.array(ar_labels.cluster_centers_).reshape(1,-1)[0])
+    ar_centers = np.array(ar_labels.cluster_centers_).reshape(1,-1)[0]
+    ar_centers = list(np.round(np.sort(ar_centers),3))
+    
 
     # cluster 15 areas
     S = (box_df['new_box_area'].values).reshape(-1,1)
@@ -50,8 +52,11 @@ def cluster_ratio_area(box_df, output_dir):
     area_centers = np.sort(np.sqrt(area_centers), axis = None).reshape(5,-1)
     base_sizes = [round(c[0]) for c in area_centers]
 
-    ele2 = [row[1] for row in area_centers]
-    ele3 = [row[2] for row in area_centers]
+    area_15_ratio = np.empty([5,3])
+    for i,row in enumerate(area_centers):
+        area_15_ratio[i] = np.array([1,row[1]/row[0], row[2]/row[0]])
+    ele2 = [row[1] for row in area_15_ratio]
+    ele3 = [row[2] for row in area_15_ratio]
     avg2=sum(ele2)/len(ele2)
     special_ele2 = [ele for ele in ele2 if ele>avg2]
 
