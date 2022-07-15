@@ -145,7 +145,7 @@ load_pipeline = [
     dict(
         type='Resize',
         img_scale=image_size,
-        ratio_range=(0.8, 1.25),
+        ratio_range=(0.5, 2),
         multiscale_mode='range',
         keep_ratio=True),
     dict(
@@ -190,7 +190,7 @@ test_pipeline = [
 ]
 
 data = dict(
-    samples_per_gpu=5,
+    samples_per_gpu=4,
     workers_per_gpu=2,
     train= dict(
         type = 'MultiImageMixDataset',
@@ -244,8 +244,8 @@ custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 load_from = 'pretrain/mask_rcnn_cbv2_swin_tiny_patch4_window7_mstrain_480-800_adamw_3x_coco.pth'
-resume_from = None
+resume_from = 'work_dirs/scratch-cp-HSV-LSJ/epoch_4.pth'
 workflow = [('train', 1)]
 fp16 = None
-work_dir = './work_dirs/scratch-cp-HSV'
+work_dir = './work_dirs/scratch-cp-HSV-LSJ'
 gpu_ids = range(0, 2)
