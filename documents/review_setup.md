@@ -48,3 +48,4 @@
     swa_load_from = 'work_dirs/scratch-cp-HSV-LSJ-merimen-fully-match-filter-type/epoch_35.pth'
 
     ```   
+- Example of SWA config file [here](../configs/cbnet/swa-scratch-copy-paste-HSV-LSJ.py)
