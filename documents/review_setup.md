@@ -1,8 +1,8 @@
 # Download repo
 - Clone repo  
 `git clone https://github.com/thangnx183/CBNetV2`
-- chekout review branch  
-`git checkout feat/AIT-14-review-cbnetv2`
+- chekout develop branch  
+`git checkout develop`
 
 # Docker setup
 - docker setup image  
@@ -27,5 +27,24 @@
 ```
 
 # Download pretrain [model](https://github.com/CBNetwork/storage/releases/download/v1.0.0/mask_rcnn_cbv2_swin_tiny_patch4_window7_mstrain_480-800_adamw_3x_coco.pth.zip)
-# Sample of [config file](../configs/cbnet/loose.py) 
+# Sample of [config file](../configs/cbnet/scratch-copy-paste-HSV-LSJ.py) 
 
+
+# Boosting model performance with Stochatic Weight Average (SWA)
+- Continue training from best checkpoint of previous training job 12 epochs more with SWA
+- Checkpout SWA training branch
+    ```
+    git checkout fear/MCAI-49-swa-training
+    ```
+- Change with value of `_base_` with path of previous config path
+    - Example : 
+    ```
+    _base_ = ['scratch-copy-paste-HSV-LSJ-merimen-fully-match.py', '../_base_/swa.py']
+
+    ```
+- Start training from best checkpoint 
+    - Example : 
+    ```
+    swa_load_from = 'work_dirs/scratch-cp-HSV-LSJ-merimen-fully-match-filter-type/epoch_35.pth'
+
+    ```   
